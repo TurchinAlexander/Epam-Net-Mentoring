@@ -96,24 +96,37 @@ namespace FileSystem.Visitor
                 {
                     OnFound(FoundTypeEnum.Directory, d);
                     stack.Push(d);
-                    foundItems.Add(d);
 
-                    if (searchFilter != null
-                        && searchFilter(d))
+                    if (searchFilter != null)
                     {
-                        OnFound(FoundTypeEnum.FilteredDirectory, d);
+                        if (searchFilter(d))
+                        {
+                            OnFound(FoundTypeEnum.FilteredDirectory, d);
+                            foundItems.Add(d);
+                        }
+                    }
+                    else
+                    {
+                        foundItems.Add(d);
                     }
                 }
 
                 foreach (var f in files)
                 {
                     OnFound(FoundTypeEnum.File, f);
+
+                    if (searchFilter != null)
+                    {
+                        if (searchFilter(f))
+                        {
+                            OnFound(FoundTypeEnum.FilteredFile, f);
+                            foundItems.Add(f);
+                        }
+                    }
+                    else
+                    {
                     foundItems.Add(f);
 
-                    if (searchFilter != null
-                        && searchFilter(f))
-                    {
-                        OnFound(FoundTypeEnum.FilteredFile, f);
                     }
                 }
             }
