@@ -139,7 +139,7 @@
     <value>Привет. Идет инициализация приложения. Программа скоро начнет работу.</value>
   </data>
   <data name="Hint" xml:space="preserve">
-    <value>Пожалуйста введите Ctrl+C or Ctrl+Break, чтобы остановить выполнение программы.</value>
+    <value>Пожалуйста введите Ctrl+Z, чтобы остановить выполнение программы.</value>
   </data>
   <data name="StartWork" xml:space="preserve">
     <value>Программа начала работу.</value>

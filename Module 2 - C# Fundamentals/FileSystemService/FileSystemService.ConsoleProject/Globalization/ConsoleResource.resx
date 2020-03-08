@@ -139,7 +139,7 @@
     <value>Hello, the app is being initializing. It will start soon.</value>
   </data>
   <data name="Hint" xml:space="preserve">
-    <value>Please enter Ctrl+C or Ctrl+Break to stop the app execution.</value>
+    <value>Please enter Ctrl+Z to stop the app execution.</value>
   </data>
   <data name="StartWork" xml:space="preserve">
     <value>The app has started to work.</value>

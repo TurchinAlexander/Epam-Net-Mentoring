@@ -124,7 +124,7 @@ namespace FileSystemService.ConsoleProject.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please enter Ctrl+C or Ctrl+Break to stop the app execution..
+        ///   Looks up a localized string similar to Please enter Ctrl+Z to stop the app execution..
         /// </summary>
         internal static string Hint {
             get {

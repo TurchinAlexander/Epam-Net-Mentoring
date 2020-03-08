@@ -17,6 +17,11 @@ namespace FileSystemService.Monitor
 
         private readonly MonitorSection monitorSection;
 
+        /// <summary>
+        /// Constructor of <see cref="FileSystemWatcher"/>.
+        /// </summary>
+        /// <remarks>The class uses <c>monitorSection</c> section in a configurationFile to set up his behaviour.</remarks>
+        /// <exception cref="ConfigurationErrorsException"> occurs when the data in monitorSection in configuration file is incorrectly.</exception>
         public FileSystemMonitor()
         {
             monitorSection = (MonitorSection) ConfigurationManager.GetSection("monitorSection");

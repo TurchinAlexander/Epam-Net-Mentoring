@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using FileSystemService.ConsoleProject.Configuration;
 using FileSystemService.ConsoleProject.Globalization;
@@ -39,7 +40,7 @@ namespace FileSystemService.ConsoleProject
                 key = Console.ReadKey();
 
                 if (((key.Modifiers & ConsoleModifiers.Control) != 0)
-                    && (key.Key.Equals(ConsoleKey.C)
+                    && (key.Key.Equals(ConsoleKey.Z)
                         || key.Key.Equals(ConsoleKey.Pause)))
                 {
                     shouldNotExit = false;
@@ -69,7 +70,12 @@ namespace FileSystemService.ConsoleProject
         private static void SetCulture(string culture)
         {
             DoesCultureExists(culture);
+
+
+
+            Console.OutputEncoding = Encoding.UTF8;
             Thread.CurrentThread.CurrentCulture = new CultureInfo(culture);
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo(culture);
         }
 
         private static void InitializeFileMonitor()
