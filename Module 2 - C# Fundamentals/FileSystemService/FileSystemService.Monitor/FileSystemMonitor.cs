@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Diagnostics.Contracts;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -85,30 +83,30 @@ namespace FileSystemService.Monitor
         private void StartExtractingFile(string source)
         {
 
-            string fileName = Path.GetFileName(source);
+            string sourceFileName = Path.GetFileName(source);
             string sourceDirectory = Path.GetDirectoryName(source);
             bool filterNotFound = true;
 
-            RaiseEvent(FileFound, new FileMonitorEventArgs(fileName, sourceDirectory));
+            RaiseEvent(FileFound, new FileMonitorEventArgs(sourceFileName, sourceDirectory));
 
             foreach (Filter filter in monitorSection.Filters)
             {
-                if (Regex.IsMatch(fileName, filter.FilePattern, RegexOptions.IgnoreCase))
+                if (Regex.IsMatch(sourceFileName, filter.FilePattern, RegexOptions.IgnoreCase))
                 {
                     filterNotFound = false;
                     
-                    RaiseEvent(FilterIsFound, new FilterMonitorEventArgs(fileName, filter.FilePattern));
+                    RaiseEvent(FilterIsFound, new FilterMonitorEventArgs(sourceFileName, filter.FilePattern));
 
-                    string destinationFileName = PrepareFileName(filter, fileName);
+                    string destinationFileName = PrepareFileName(filter, sourceFileName);
                     
                     File.Copy(source, Path.Combine(filter.DestinationFolder, destinationFileName), true);
-                    RaiseEvent(FileIsTransferred, new TransferMonitorEventArgs(fileName, sourceDirectory, filter.DestinationFolder));
+                    RaiseEvent(FileIsTransferred, new TransferMonitorEventArgs(sourceFileName, sourceDirectory, filter.DestinationFolder));
                 }
             }
 
             if (filterNotFound)
             {
-                RaiseEvent(FilterIsNotFound, new FileMonitorEventArgs(fileName, sourceDirectory));
+                RaiseEvent(FilterIsNotFound, new FileMonitorEventArgs(sourceFileName, sourceDirectory));
             }
             
             File.Delete(source);

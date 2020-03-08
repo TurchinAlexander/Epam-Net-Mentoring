@@ -3,12 +3,10 @@ using System.Configuration;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using FileSystemService.ConsoleProject.Configuration;
 using FileSystemService.ConsoleProject.Globalization;
 using FileSystemService.Monitor;
 using FileSystemService.Monitor.MonitorEventArgs;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace FileSystemService.ConsoleProject
 {
