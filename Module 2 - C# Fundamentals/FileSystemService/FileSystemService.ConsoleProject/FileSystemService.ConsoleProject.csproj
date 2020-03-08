@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Remove="Globalization\ConsoleResource.ru-RU.resx~RFf137de8.TMP" />
       <None Remove="Globalization\UI.resx~RFea93c3f.TMP" />
     </ItemGroup>
 

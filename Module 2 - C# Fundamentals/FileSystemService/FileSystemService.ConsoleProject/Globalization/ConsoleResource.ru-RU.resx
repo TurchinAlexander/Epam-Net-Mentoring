@@ -123,6 +123,18 @@
   <data name="EnterAnyKey" xml:space="preserve">
     <value>Пожалуйста нажмите любую клавишу для выхода из программы.</value>
   </data>
+  <data name="FileFound" xml:space="preserve">
+    <value>Файл {0} найден в папке {1}</value>
+  </data>
+  <data name="FileTrasnferred" xml:space="preserve">
+    <value>Файл {0} был переведен из папки {1} в папку {1}</value>
+  </data>
+  <data name="FilterFound" xml:space="preserve">
+    <value>Фильтр с шаблоном {0} применен к файлу {1}</value>
+  </data>
+  <data name="FilterNotFound" xml:space="preserve">
+    <value>Никакой фильтр не был применен к файлу {0}</value>
+  </data>
   <data name="Greeting" xml:space="preserve">
     <value>Привет. Идет инициализация приложения. Программа скоро начнет работу.</value>
   </data>

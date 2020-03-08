@@ -123,6 +123,18 @@
   <data name="EnterAnyKey" xml:space="preserve">
     <value>Please enter any key to exit from the application.</value>
   </data>
+  <data name="FileFound" xml:space="preserve">
+    <value>The file {0} is found in the directory {1}</value>
+  </data>
+  <data name="FileTrasnferred" xml:space="preserve">
+    <value>The file {0} has been transferred from directory {1} to directory {1}</value>
+  </data>
+  <data name="FilterFound" xml:space="preserve">
+    <value>The filter with pattern {0} is applied to file {1}</value>
+  </data>
+  <data name="FilterNotFound" xml:space="preserve">
+    <value>No filter is applied to file {0}</value>
+  </data>
   <data name="Greeting" xml:space="preserve">
     <value>Hello, the app is being initializing. It will start soon.</value>
   </data>

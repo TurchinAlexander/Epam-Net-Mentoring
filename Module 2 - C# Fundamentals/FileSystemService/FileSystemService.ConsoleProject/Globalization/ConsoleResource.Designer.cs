@@ -79,6 +79,42 @@ namespace FileSystemService.ConsoleProject.Globalization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The file {0} is found in the directory {1}.
+        /// </summary>
+        internal static string FileFound {
+            get {
+                return ResourceManager.GetString("FileFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The file {0} has been transferred from directory {1} to directory {1}.
+        /// </summary>
+        internal static string FileTrasnferred {
+            get {
+                return ResourceManager.GetString("FileTrasnferred", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The filter with pattern {0} is applied to file {1}.
+        /// </summary>
+        internal static string FilterFound {
+            get {
+                return ResourceManager.GetString("FilterFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No filter is applied to file {0}.
+        /// </summary>
+        internal static string FilterNotFound {
+            get {
+                return ResourceManager.GetString("FilterNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Hello, the app is being initializing. It will start soon..
         /// </summary>
         internal static string Greeting {

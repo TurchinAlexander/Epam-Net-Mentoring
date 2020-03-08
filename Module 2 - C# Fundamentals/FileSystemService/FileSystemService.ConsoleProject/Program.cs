@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using FileSystemService.ConsoleProject.Configuration;
 using FileSystemService.ConsoleProject.Globalization;
 using FileSystemService.Monitor;
+using FileSystemService.Monitor.MonitorEventArgs;
+using Microsoft.VisualBasic.CompilerServices;
 
 namespace FileSystemService.ConsoleProject
 {
@@ -19,12 +21,11 @@ namespace FileSystemService.ConsoleProject
             ConsoleSection consoleSection = (ConsoleSection) ConfigurationManager.GetSection("consoleSection");
             string culture = consoleSection.CultureLocalization.Name;
 
-            DoesCultureExists(culture);
             SetCulture(culture);
          
             Console.WriteLine(ConsoleResource.Greeting);
 
-            fileMonitor = new FileSystemMonitor();
+            InitializeFileMonitor();
 
             Console.WriteLine(ConsoleResource.StartWork);
             
@@ -69,7 +70,42 @@ namespace FileSystemService.ConsoleProject
 
         private static void SetCulture(string culture)
         {
+            DoesCultureExists(culture);
             Thread.CurrentThread.CurrentCulture = new CultureInfo(culture);
+        }
+
+        private static void InitializeFileMonitor()
+        {
+            fileMonitor = new FileSystemMonitor();
+
+            fileMonitor.FileFound += FileFound;
+            fileMonitor.FilterIsFound += FilterFound;
+            fileMonitor.FilterIsNotFound += FilterNotFound;
+            fileMonitor.FileIsTransferred += FileIsTransferred;
+        }
+
+        private static void FileFound(object sender, FileMonitorEventArgs e)
+        {
+            string message = string.Format(ConsoleResource.FileFound, e.FileName, e.Directory);
+            Console.WriteLine(message);
+        }
+
+        private static void FilterFound(object sender, FilterMonitorEventArgs e)
+        {
+            string message = string.Format(ConsoleResource.FilterFound, e.FilterPattern, e.FileName);
+            Console.WriteLine(message);
+        }
+
+        private static void FilterNotFound(object sender, FileMonitorEventArgs e)
+        {
+            string message = string.Format(ConsoleResource.FilterNotFound, e.FileName);
+            Console.WriteLine(message);
+        }
+
+        private static void FileIsTransferred(object sender, TransferMonitorEventArgs e)
+        {
+            string message = string.Format(ConsoleResource.FileTrasnferred, e.FileName, e.Source, e.Destination);
+            Console.WriteLine(message);
         }
     }
 }

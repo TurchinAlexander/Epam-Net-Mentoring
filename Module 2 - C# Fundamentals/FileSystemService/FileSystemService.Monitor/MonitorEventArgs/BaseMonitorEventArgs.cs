@@ -7,7 +7,7 @@ namespace FileSystemService.Monitor.MonitorEventArgs
     {
         public string FileName { get; }
 
-        public BaseMonitorEventArgs(string fileName)
+        protected BaseMonitorEventArgs(string fileName)
         {
             Contract.Requires<ArgumentNullException>(fileName != null);
             Contract.Requires<ArgumentException>(fileName != string.Empty);
