@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <AssemblyName>FileSystemService.ConsoleProject</AssemblyName>
+        <RootNamespace>FileSystemService.ConsoleProject</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Remove="Globalization\UI.resx~RFea93c3f.TMP" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\FileSystemService.Monitor\FileSystemService.Monitor.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="app.Designer.cs">
+        <DesignTimeSharedInput>True</DesignTimeSharedInput>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>app.config</DependentUpon>
+      </Compile>
+      <Compile Update="Globalization\ConsoleResource.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>ConsoleResource.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Globalization\ConsoleResource.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>ConsoleResource.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="app.config">
+        <Generator>SettingsSingleFileGenerator</Generator>
+        <LastGenOutput>app.Designer.cs</LastGenOutput>
+      </None>
+    </ItemGroup>
+
+</Project>
