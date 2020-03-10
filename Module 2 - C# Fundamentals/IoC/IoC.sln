@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IoC", "IoC\IoC.csproj", "{BB52C367-C225-43C9-A301-B15568B3400F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IoC.Tests", "IoC.Tests\IoC.Tests.csproj", "{61200142-10E2-40AA-AD7C-17242E8B0FD3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BB52C367-C225-43C9-A301-B15568B3400F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB52C367-C225-43C9-A301-B15568B3400F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB52C367-C225-43C9-A301-B15568B3400F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB52C367-C225-43C9-A301-B15568B3400F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61200142-10E2-40AA-AD7C-17242E8B0FD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61200142-10E2-40AA-AD7C-17242E8B0FD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61200142-10E2-40AA-AD7C-17242E8B0FD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61200142-10E2-40AA-AD7C-17242E8B0FD3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
