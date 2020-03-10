@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using IoC.Attributes;
 
 namespace IoC.Tests
 {
@@ -46,4 +47,14 @@ namespace IoC.Tests
 
     class Pet
     { }
+
+    class Animal
+    {
+        [Init]
+        public Animal parent { get; set; }
+    }
+
+    interface INoRelization
+    {
+    } 
 }

@@ -1,4 +1,5 @@
-﻿using NUnit;
+﻿using IoC.Exceptions;
+using NUnit;
 using NUnit.Framework;
 
 namespace IoC.Tests
@@ -6,7 +7,7 @@ namespace IoC.Tests
     [TestFixture]
     public class ContainerTest
     {
-        private Container Container;
+        protected Container Container;
 
         [SetUp]
         public void BeforeEach()
@@ -19,12 +20,14 @@ namespace IoC.Tests
         {
             Container = null;
         }
+    
 
         [Test]
         public void GetInstance_CreateInstanceWithNoParams_InstanceCreated()
         {
-            var subject = (ClassWithNoExplicitConstructors) Container.GetInstance(typeof(ClassWithNoExplicitConstructors));
-            
+            var subject =
+                (ClassWithNoExplicitConstructors) Container.GetInstance(typeof(ClassWithNoExplicitConstructors));
+
             Assert.IsInstanceOf<ClassWithNoExplicitConstructors>(subject);
         }
 
@@ -32,15 +35,17 @@ namespace IoC.Tests
         public void GetInstance_CreateInstanceWithParams_InstanceCreated()
         {
             var subject = (ClassWithOneParamConstructor) Container.GetInstance(typeof(ClassWithOneParamConstructor));
-            
+
             Assert.IsInstanceOf<ClassWithOneParamConstructor>(subject);
         }
 
         [Test]
         public void GetInstance_CreateInstanceWithExplicitParameterlessConstructor_InstanceCreated()
         {
-            var subject = (ClassWithExplicitParameterlessConstructor) Container.GetInstance(typeof(ClassWithExplicitParameterlessConstructor));
-            
+            var subject =
+                (ClassWithExplicitParameterlessConstructor) Container.GetInstance(
+                    typeof(ClassWithExplicitParameterlessConstructor));
+
             Assert.IsInstanceOf<ClassWithExplicitParameterlessConstructor>(subject);
         }
 
@@ -48,10 +53,22 @@ namespace IoC.Tests
         public void GetInstance_CreateInstanceUsingGenericMethod_InstanceCreated()
         {
             var subject = Container.GetInstance<ClassWithNoExplicitConstructors>();
-            
+
             Assert.IsInstanceOf<ClassWithNoExplicitConstructors>(subject);
         }
 
+        [Test]
+        public void GetInstance_CreateInstanceWithSelfreference_CircularReferenceException()
+        {
+            Assert.Throws<CircularReferenceException>(() => Container.GetInstance<Animal>());
+        }
+
+        public void GetInstance_GetInstanceOfNotRegistered_NotRegisterException()
+        {
+            Assert.Throws<NotRegisterException>(() => Container.GetInstance<INoRelization>());
+        }
+    
+    
         [Test]
         public void Register_CreateInstanceFromInterface()
         {
@@ -83,5 +100,6 @@ namespace IoC.Tests
 
             Assert.AreSame(subject1, subject2);
         }
+        
     }
 }

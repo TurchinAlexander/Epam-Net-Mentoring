@@ -80,9 +80,11 @@ namespace IoC
                 throw new NotRegisterException(type);
             }
 
-            trace.Pop();
+            var result = CreateInstance(type);
             
-            return CreateInstance(type);
+            trace.Pop();
+
+            return result;
         }
         
         /// <summary>
