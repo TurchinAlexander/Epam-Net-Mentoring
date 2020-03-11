@@ -1,0 +1,10 @@
+
+CREATE TABLE dbo.EmployeeCard 
+(
+	EmployeeCardId INT IDENTITY(1, 1) PRIMARY KEY,
+	CardNumber VARCHAR(16) NOT NULL,
+	EmployeeId INT NOT NULL REFERENCES dbo.Employees(EmployeeID),
+	CreatedDate DATETIMEOFFSET NOT NULL,
+	ExpiredDate DATETIMEOFFSET NOT NULL
+)
+
