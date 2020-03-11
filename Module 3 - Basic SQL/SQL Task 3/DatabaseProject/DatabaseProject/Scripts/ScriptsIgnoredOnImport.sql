@@ -14851,16 +14851,16 @@ GO
 
 -- The following adds data to the tables just created.
 
-Insert Into Region Values (1,'Eastern')
+Insert Into [Regions] Values (1,'Eastern')
 GO
 
-Insert Into Region Values (2,'Western')
+Insert Into [Regions] Values (2,'Western')
 GO
 
-Insert Into Region Values (3,'Northern')
+Insert Into [Regions] Values (3,'Northern')
 GO
 
-Insert Into Region Values (4,'Southern')
+Insert Into [Regions] Values (4,'Southern')
 GO
 
 Insert Into Territories Values ('01581','Westboro',1)
