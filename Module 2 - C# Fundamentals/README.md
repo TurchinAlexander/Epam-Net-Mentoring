@@ -1,8 +1,6 @@
-# Epam-Net-Mentoring
+# C# Fundamentals
 
-## C# Fundamentals
-
-### 1. FileSystemVisitor
+## 1. FileSystemVisitor
 
 Create a class to show all files and subdirectories from the selected directory. When searching the files one of the four events can be raised:  
 1. `FileFound`
@@ -16,9 +14,9 @@ Event is raised after the DirectoryFound event when the filter is set up in File
 
 Besides create a unit test to cover up FileSystemVisitor and check its' functionality.
 
-### 2. File System Service
+## 2. File System Service
 
-#### Base Info
+### Base Info
 The project is used to set up the watch on the specified directories and when new file is transfered to the watched directories the job start looking through the filter to get information what it need to be done with the file.
 
 All necessary work is done inside the configuration file under sections:
@@ -36,13 +34,13 @@ All necessary work is done inside the configuration file under sections:
 
 To have the posibility to show message on the console in diffrent languages, the project uses .resx files to take culture variant messages to show.
 
-### 3. Exception Hangling
+## 3. Exception Hangling
 
 There are two project in this section:
 1. Show the first character of the string which an used entered. Handle the situation when the used enterd nothing.
 2. Create custom string to int converter. To convert a developer can use TryConvert to have a posibility to check if the conversion has been done successfully. Or he can use Convert method but it will throw an exception when the input string is invalid.
 
-### 4. Inversion of Control container
+## 4. Inversion of Control container
 
 IoC container is used to connect the object to each other at Runtime without any need from developer side to explicitly use `new` clause in his project.
 
