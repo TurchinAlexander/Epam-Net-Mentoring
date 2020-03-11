@@ -106,4 +106,7 @@
   <ItemGroup>
     <RefactorLog Include="DatabaseProject.refactorlog" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="UpdateScripts\Script1.sql" />
+  </ItemGroup>
 </Project>
