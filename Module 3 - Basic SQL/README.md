@@ -106,3 +106,38 @@ Use nested SELECT.
 3. Output all customers ( the Customers table) that do not have any orders  
 (for a query in the Orders table).  
 You use the EXISTS operator.
+
+## Task 3. Deploying the database and updates
+
+My task is to prepare several versions of the NorthwindExtended project for release, or rather, the project database. The source project is based on the original Northwind database (the source code of which can be found in current directory).  
+The following 3 versions are expected to be released as part of NorthwindExtended:
+* Version 1.0. Based on the original Northwind database
+* Version 1.1. Adds a table of employee credit card data: card number, expiration date, cardholder name, employee link, …
+* Version 1.3. Adds the following minor changes relative to 1.1:
+    * Rename Region to Regions
+    * Adding the base date to the customer table
+
+### Task 3.1 Using Alter Scripts
+
+Create 2 scripts to update datbase to versions
+* 1.0 -> 1.1
+* 1.1 -> 1.3
+
+When performing a task, ensure that scripts can be rolled repeatedly(for example, in case of an erroneous re-update) without errors.
+
+### Task 3.2 Using SSDT
+
+Import the original Northwind database (from the instnwnd database or script) .sql) in a database project for Visual Studio. Import only metadata, you don 't need to transfer data!
+Present 3 versions of the SSDT-based project with changes as described above. 
+Make sure that when using an SSDT, you can update versions either sequentially or skipping the version. And also check that multiple updates work.
+
+### Task 3.3 Insert data when deploying
+
+Insert data for following tables
+* Categories
+* Suppliers
+* Products
+
+You can find this script in `Manual Alter Database` `InsertInDatabase.sql`.
+
+Create a deployment file to insert this data when deploying.
