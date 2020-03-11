@@ -24,15 +24,15 @@ The project is used to set up the watch on the specified directories and when ne
 All necessary work is done inside the configuration file under sections:
 1. Console section (name - consoleSection)
     1. `cultureLocalization` - specify the language used to show the messages on the console. Either en-US or ru-RU.
-2. Monitor section (name - monitorSection) - set up the service.
-    1.`Directories`  - set up the directories what need to be watched.
+2. Monitor section (name - monitorSection) - set up the service.  
+    1. `Directories`  - set up the directories what need to be watched.  
         * `path` - you need to specify the path of the directory needed to be watched.
     2. Filters
-    Set up the filters which should be used to determine what need to be done with incoming files.
-        * `pattern` - the pattern of file on which this filter should be used.
-        * `destinationFolder` - the output directory where the file should be put.
-        * `addPositionNumber` - true or false. Set up the number before file name in the output directory.
-        * `addMovementDate` - true or false. Set up the date when the file have been transfered to the output directory.
+    Set up the filters which should be used to determine what need to be done with incoming files.  
+        * `pattern` - the pattern of file on which this filter should be used.  
+        * `destinationFolder` - the output directory where the file should be put.  
+        * `addPositionNumber` - true or false. Set up the number before file name in the output directory.  
+        * `addMovementDate` - true or false. Set up the date when the file have been transfered to the output directory.  
 
 To have the posibility to show message on the console in diffrent languages, the project uses .resx files to take culture variant messages to show.
 
