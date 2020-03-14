@@ -5,14 +5,33 @@ namespace DataAccessLayer
 {
     public class Order
     {
-        public int OrderId { get; set; }
+        private int orderId;
 
-        public DateTime? OrderDate { get; set; }
+        public int OrderId
+        {
+            get => orderId;
+            set
+            {
+                CanChange();
 
-        public DateTime? ShippedDate { get; set; }
+                orderId = value;
+            }
+        }
 
-        public OrderStatus Status { get; set; }
+        public DateTime? OrderDate { get; internal set; }
+
+        public DateTime? ShippedDate { get; internal set; }
+
+        public OrderStatus Status { get; internal set; }
 
         public ICollection<Product> Products { get; set; }
+
+        private void CanChange()
+        {
+            if (Status != OrderStatus.New)
+            {
+                throw new InvalidOperationException();
+            }
+        }
     }
 }

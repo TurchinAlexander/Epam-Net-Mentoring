@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -48,6 +49,14 @@ namespace DataAccessLayer.Tests
 
             Assert.True(order.OrderId > 0);
             Assert.True(order.OrderDate.HasValue);
+        }
+
+        [Test]
+        public void ChangeOrder_InvalidOperationException()
+        {
+            var order = orderRepository.GetDetailedOrder(10248);
+
+            Assert.Throws<InvalidOperationException>(() => order.OrderId = 10);
         }
     }
 }
