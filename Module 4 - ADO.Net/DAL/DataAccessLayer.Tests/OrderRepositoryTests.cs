@@ -94,5 +94,21 @@ namespace DataAccessLayer.Tests
             Assert.True(updatedOrder.ShippedDate != null
                         && updatedOrder.Status == OrderStatus.Shipped);
         }
+
+        [Test]
+        public void GetCustomerOrderDetails_ReturnResult()
+        {
+            var result = orderRepository.GetCustomerOrderDetails(10248);
+
+            Assert.True(result.Count() > 0);
+        }
+
+        [Test]
+        public void GetCustomerOrderHistory_ReturnResult()
+        {
+            var result = orderRepository.GetCustomerOrderHistory("ALFKI");
+
+            Assert.True(result.Count() > 0);
+        }
     }
 }

@@ -226,6 +226,70 @@ namespace DataAccessLayer
             return order;
         }
 
+        public IEnumerable<CustomerOrderDetails> GetCustomerOrderDetails(int orderId)
+        {
+            var customerOrderDetails = new List<CustomerOrderDetails>();
+            var connection = providerFactory.CreateConnection();
+            connection.ConnectionString = connectionString;
+
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = "[dbo].[CustOrdersDetail]";
+
+            var orderIdParam = command.CreateParameter();
+            orderIdParam.ParameterName = "@OrderID";
+            orderIdParam.Value = orderId;
+
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.Add(orderIdParam);
+
+            var dataReader = command.ExecuteReader();
+
+            while (dataReader.Read())
+            {
+                customerOrderDetails.Add(MapCustomerOrderDetails(dataReader));
+            }
+           
+            dataReader.Close();
+            command.Dispose();
+            connection.Close();
+
+            return customerOrderDetails;
+        }
+
+        public IEnumerable<CustomerOrderHistory> GetCustomerOrderHistory(string customerId)
+        {
+            var customerOrderHistory = new List<CustomerOrderHistory>();
+            var connection = providerFactory.CreateConnection();
+            connection.ConnectionString = connectionString;
+
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = "[dbo].[CustOrderHist]";
+
+            var customerIdParam = command.CreateParameter();
+            customerIdParam.ParameterName = "@CustomerID";
+            customerIdParam.Value = customerId;
+
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.Add(customerIdParam);
+
+            var dataReader = command.ExecuteReader();
+
+            while (dataReader.Read())
+            {
+                customerOrderHistory.Add(MapCustomerOrderHistory(dataReader));
+            }
+
+            dataReader.Close();
+            command.Dispose();
+            connection.Close();
+
+            return customerOrderHistory;
+        }
+
         private Order MapOrder(DbDataReader dataReader)
         {
             var order = new Order();
@@ -259,6 +323,29 @@ namespace DataAccessLayer
             product.ProductName = dataReader.GetString(1);
 
             return product;
+        }
+
+        private CustomerOrderDetails MapCustomerOrderDetails(DbDataReader dataReader)
+        {
+            var result = new CustomerOrderDetails();
+
+            result.ProductName = dataReader.GetString(0);
+            result.UnitPrice = dataReader.GetDecimal(1);
+            result.Quantity = dataReader.GetInt16(2);
+            result.Discount = dataReader.GetInt32(3);
+            result.ExtendedPrice = dataReader.GetDecimal(4);
+
+            return result;
+        }
+
+        private CustomerOrderHistory MapCustomerOrderHistory(DbDataReader dataReader)
+        {
+            var result = new CustomerOrderHistory();
+
+            result.ProductName = dataReader.GetString(0);
+            result.Total = dataReader.GetInt32(1);
+
+            return result;
         }
     }
 }
