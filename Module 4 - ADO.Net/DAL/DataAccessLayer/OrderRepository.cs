@@ -31,6 +31,7 @@ namespace DataAccessLayer
 
             order.OrderId = Convert.ToInt32(command.ExecuteScalar());
             order.OrderDate = DateTime.Now;
+            order.Status = OrderStatus.InProgress;
 
             command.Dispose();
             connection.Close();
