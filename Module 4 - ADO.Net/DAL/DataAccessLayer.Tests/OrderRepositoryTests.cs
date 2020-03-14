@@ -24,9 +24,19 @@ namespace DataAccessLayer.Tests
         [Test]
         public void GetOrders_Nothing_EnumerableListOfOrders()
         {
-            var result = orderRepository.GetOrders();
+            var result = orderRepository.GetOrders()
+                .ToList();
 
-            Assert.True(result.ToList().Count > 0);
+            Assert.True(result.Count > 0);
+        }
+
+        [Test]
+        public void GetDetailedOrder_Nothing_OrderWithProducts()
+        {
+            var result = orderRepository.GetDetailedOrder(10248);
+
+            Assert.True(result != null);
+            Assert.True(result.Products.Count > 0);
         }
     }
 }

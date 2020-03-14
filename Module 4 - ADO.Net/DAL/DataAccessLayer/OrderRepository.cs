@@ -42,7 +42,7 @@ namespace DataAccessLayer
                 ",[ShipRegion]" +
                 ",[ShipPostalCode]" +
                 ",[ShipCountry]" +
-                "FROM [Northwind].[dbo].[Orders]";
+                " FROM [Northwind].[dbo].[Orders]";
             command.CommandType = CommandType.Text;
 
             var dataReader = command.ExecuteReader();
@@ -53,7 +53,7 @@ namespace DataAccessLayer
             
             while (dataReader.Read())
             {
-                var order = Map(dataReader);
+                var order = MapOrder(dataReader);
                 
                 orders.Add(order);
             }
@@ -65,7 +65,77 @@ namespace DataAccessLayer
             return orders;
         }
 
-        private Order Map(DbDataReader dataReader)
+        public Order GetDetailedOrder(int id)
+        {
+            var connection = providerFactory.CreateConnection();
+            connection.ConnectionString = connectionString;
+
+            connection.Open();
+
+            var command = connection.CreateCommand();
+
+            command.CommandText =
+                "SELECT " +
+                " [OrderID]" +
+                ",[CustomerID]" +
+                ",[EmployeeID]" +
+                ",[OrderDate]" +
+                ",[RequiredDate]" +
+                ",[ShippedDate]" +
+                ",[ShipVia]" +
+                ",[Freight]" +
+                ",[ShipName]" +
+                ",[ShipAddress]" +
+                ",[ShipCity]" +
+                ",[ShipRegion]" +
+                ",[ShipPostalCode]" +
+                ",[ShipCountry]" +
+                " FROM [Northwind].[dbo].[Orders] AS O" +
+                " WHERE O.OrderID = @id;" +
+
+                "select" +
+                " P.ProductID," +
+                " P.ProductName" +
+                " from Products as P" +
+                " join[Order Details] AS OD" +
+                " on P.ProductID = OD.ProductID" +
+                " join Orders AS O" +
+                " on O.OrderID = @id" +
+                " group by P.ProductID," +
+                " P.ProductName;";
+            command.CommandType = CommandType.Text;
+
+            var param = command.CreateParameter();
+            param.ParameterName = "@id";
+            param.Value = id;
+
+            command.Parameters.Add(param);
+
+            var dataReader = command.ExecuteReader();
+            if (!dataReader.HasRows)
+            {
+                return null;
+            }
+
+            dataReader.Read();
+            var order = MapOrder(dataReader);
+
+            dataReader.NextResult();
+            order.Products = new List<Product>();
+
+            while (dataReader.Read())
+            {
+                order.Products.Add(MapProduct(dataReader));
+            }
+
+            dataReader.Close();
+            command.Dispose();
+            connection.Close();
+
+            return order;
+        }
+
+        private Order MapOrder(DbDataReader dataReader)
         {
             var order = new Order();
 
@@ -98,6 +168,17 @@ namespace DataAccessLayer
             }
 
             return order;
+        }
+
+
+        private Product MapProduct(DbDataReader dataReader)
+        {
+            var product = new Product();
+
+            product.ProductId = dataReader.GetInt32(0);
+            product.ProductName = dataReader.GetString(1);
+
+            return product;
         }
     }
 }

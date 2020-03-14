@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace DataAccessLayer
 {
@@ -33,5 +34,7 @@ namespace DataAccessLayer
         public string ShipCountry { get; set; }
 
         public OrderStatus Status { get; set; }
+
+        public ICollection<Product> Products { get; set; }
     }
 }
