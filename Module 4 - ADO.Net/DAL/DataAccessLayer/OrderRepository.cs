@@ -26,12 +26,11 @@ namespace DataAccessLayer
 
             var command = connection.CreateCommand();
 
-            command.CommandText = "insert into orders (orderdate) values (getdate());" +
+            command.CommandText = "insert into orders (requireddate) values (getdate());" +
                                   "select @@IDENTITY;";
 
             order.OrderId = Convert.ToInt32(command.ExecuteScalar());
-            order.OrderDate = DateTime.Now;
-            order.Status = OrderStatus.InProgress;
+            order.RequiredDate = DateTime.Now;
 
             command.Dispose();
             connection.Close();
@@ -53,6 +52,7 @@ namespace DataAccessLayer
                 "SELECT " +
                 " [OrderID]" +
                 ",[OrderDate]" +
+                ",[RequiredDate]" +
                 ",[ShippedDate]" +
                 " FROM [Northwind].[dbo].[Orders]";
             command.CommandType = CommandType.Text;
@@ -90,6 +90,7 @@ namespace DataAccessLayer
                 "SELECT " +
                 " [OrderID]" +
                 ",[OrderDate]" +
+                ",[RequiredDate]" +
                 ",[ShippedDate]" +
                 " FROM [Northwind].[dbo].[Orders] AS O" +
                 " WHERE O.OrderID = @id;" +
@@ -142,7 +143,8 @@ namespace DataAccessLayer
 
             order.OrderId = dataReader.GetInt32(0);
             order.OrderDate = (!dataReader.IsDBNull(1)) ? (DateTime?)dataReader.GetDateTime(1) : null;
-            order.ShippedDate = (!dataReader.IsDBNull(2)) ? (DateTime?)dataReader.GetDateTime(2) : null;
+            order.RequiredDate = (!dataReader.IsDBNull(2)) ? (DateTime?)dataReader.GetDateTime(2) : null;
+            order.ShippedDate = (!dataReader.IsDBNull(3)) ? (DateTime?)dataReader.GetDateTime(3) : null;
 
             if (order.OrderDate == null)
             {

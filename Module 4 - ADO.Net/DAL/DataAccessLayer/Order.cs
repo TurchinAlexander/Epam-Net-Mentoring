@@ -20,6 +20,8 @@ namespace DataAccessLayer
 
         public DateTime? OrderDate { get; internal set; }
 
+        public DateTime? RequiredDate { get; internal set; }
+
         public DateTime? ShippedDate { get; internal set; }
 
         public OrderStatus Status { get; internal set; }

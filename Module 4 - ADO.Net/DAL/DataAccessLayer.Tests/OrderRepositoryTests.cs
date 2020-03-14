@@ -51,7 +51,7 @@ namespace DataAccessLayer.Tests
             var updatedOrder = orderRepository.Add(order);
 
             Assert.True(order.OrderId > 0);
-            Assert.True(order.OrderDate.HasValue);
+            Assert.True(order.RequiredDate.HasValue);
         }
 
         [Test]
