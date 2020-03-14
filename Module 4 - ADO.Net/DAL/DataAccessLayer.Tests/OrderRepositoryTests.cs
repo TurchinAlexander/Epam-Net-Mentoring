@@ -12,7 +12,10 @@ namespace DataAccessLayer.Tests
     public class OrderRepositoryTests
     {
         private static DbProviderFactory factory = SqlClientFactory.Instance;
-        private static string connectionString = @"Server=DESKTOP-J66IAL7\SQLEXPRESS;Database=Northwind;Trusted_Connection = true";
+
+        private static string connectionString =
+            @"Server=DESKTOP-J66IAL7\SQLEXPRESS;Database=Northwind;Trusted_Connection = true";
+
         private static OrderRepository orderRepository;
 
 
@@ -57,6 +60,17 @@ namespace DataAccessLayer.Tests
             var order = orderRepository.GetDetailedOrder(10248);
 
             Assert.Throws<InvalidOperationException>(() => order.OrderId = 10);
+        }
+
+        [Test]
+        public void Delete_OrderIsDeleted()
+        {
+            var order = new Order();
+            var updatedOrder = orderRepository.Add(order);
+
+            var deletedOrder = orderRepository.Delete(updatedOrder.OrderId);
+
+            Assert.True(updatedOrder.OrderId == deletedOrder.OrderId);
         }
     }
 }

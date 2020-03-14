@@ -160,6 +160,38 @@ namespace DataAccessLayer
             return order;
         }
 
+        public Order Delete(int id)
+        {
+            var order = GetDetailedOrder(id);
+
+            if (order.Status == OrderStatus.Shipped)
+            {
+                return order;
+            }
+
+            var orders = new List<Order>();
+            var connection = providerFactory.CreateConnection();
+            connection.ConnectionString = connectionString;
+
+            connection.Open();
+
+            var command = connection.CreateCommand();
+
+            command.CommandText = "delete orders where orderID = @id";
+
+            var param = command.CreateParameter();
+            param.ParameterName = "@id";
+            param.Value = id;
+
+            command.Parameters.Add(param);
+
+            command.ExecuteNonQuery();
+
+            command.Dispose();
+            connection.Close();
+
+            return order;
+        }
 
         private Product MapProduct(DbDataReader dataReader)
         {
