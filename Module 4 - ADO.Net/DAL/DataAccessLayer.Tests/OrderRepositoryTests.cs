@@ -38,5 +38,16 @@ namespace DataAccessLayer.Tests
             Assert.True(result != null);
             Assert.True(result.Products.Count > 0);
         }
+
+        [Test]
+        public void Add_Order_ReturnOrderWithOrderId()
+        {
+            var order = new Order();
+
+            var updatedOrder = orderRepository.Add(order);
+
+            Assert.True(order.OrderId > 0);
+            Assert.True(order.OrderDate.HasValue);
+        }
     }
 }

@@ -15,7 +15,29 @@ namespace DataAccessLayer
             this.providerFactory = providerFactory ?? throw new ArgumentNullException(nameof(providerFactory));
             this.connectionString = connectionString ?? throw new ArgumentNullException(nameof(providerFactory));
         }
-        
+
+        public Order Add(Order order)
+        {
+            var orders = new List<Order>();
+            var connection = providerFactory.CreateConnection();
+            connection.ConnectionString = connectionString;
+
+            connection.Open();
+
+            var command = connection.CreateCommand();
+
+            command.CommandText = "insert into orders (orderdate) values (getdate());" +
+                                  "select @@IDENTITY;";
+
+            order.OrderId = Convert.ToInt32(command.ExecuteScalar());
+            order.OrderDate = DateTime.Now;
+
+            command.Dispose();
+            connection.Close();
+
+            return order;
+        }
+
         public IEnumerable<Order> GetOrders()
         {
             var orders = new List<Order>();
