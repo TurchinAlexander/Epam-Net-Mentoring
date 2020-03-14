@@ -29,19 +29,8 @@ namespace DataAccessLayer
             command.CommandText =
                 "SELECT " +
                 " [OrderID]" +
-                ",[CustomerID]" +
-                ",[EmployeeID]" +
                 ",[OrderDate]" +
-                ",[RequiredDate]" +
                 ",[ShippedDate]" +
-                ",[ShipVia]" +
-                ",[Freight]" +
-                ",[ShipName]" +
-                ",[ShipAddress]" +
-                ",[ShipCity]" +
-                ",[ShipRegion]" +
-                ",[ShipPostalCode]" +
-                ",[ShipCountry]" +
                 " FROM [Northwind].[dbo].[Orders]";
             command.CommandType = CommandType.Text;
 
@@ -77,31 +66,20 @@ namespace DataAccessLayer
             command.CommandText =
                 "SELECT " +
                 " [OrderID]" +
-                ",[CustomerID]" +
-                ",[EmployeeID]" +
                 ",[OrderDate]" +
-                ",[RequiredDate]" +
                 ",[ShippedDate]" +
-                ",[ShipVia]" +
-                ",[Freight]" +
-                ",[ShipName]" +
-                ",[ShipAddress]" +
-                ",[ShipCity]" +
-                ",[ShipRegion]" +
-                ",[ShipPostalCode]" +
-                ",[ShipCountry]" +
                 " FROM [Northwind].[dbo].[Orders] AS O" +
                 " WHERE O.OrderID = @id;" +
 
-                "select" +
+                "SELECT" +
                 " P.ProductID," +
                 " P.ProductName" +
-                " from Products as P" +
-                " join[Order Details] AS OD" +
-                " on P.ProductID = OD.ProductID" +
-                " join Orders AS O" +
-                " on O.OrderID = @id" +
-                " group by P.ProductID," +
+                " FROM Products AS P" +
+                " JOIN [Order Details] AS OD" +
+                " ON P.ProductID = OD.ProductID" +
+                " JOIN Orders AS O" +
+                " ON O.OrderID = @id" +
+                " GROUP BY P.ProductID," +
                 " P.ProductName;";
             command.CommandType = CommandType.Text;
 
@@ -140,19 +118,8 @@ namespace DataAccessLayer
             var order = new Order();
 
             order.OrderId = dataReader.GetInt32(0);
-            order.CustomerId = (!dataReader.IsDBNull(1)) ? dataReader.GetString(1) : null;
-            order.EmployeeId = (!dataReader.IsDBNull(2)) ? (int?)dataReader.GetInt32(2) : null;
-            order.OrderDate = (!dataReader.IsDBNull(3)) ? (DateTime?)dataReader.GetDateTime(3) : null;
-            order.RequiredDate = (!dataReader.IsDBNull(4)) ? (DateTime?)dataReader.GetDateTime(4) : null;
-            order.ShippedDate = (!dataReader.IsDBNull(5)) ? (DateTime?)dataReader.GetDateTime(5) : null;
-            order.ShipVia = (!dataReader.IsDBNull(6)) ? (int?)dataReader.GetInt32(6) : null;
-            order.Freight = (!dataReader.IsDBNull(7)) ? (int?)dataReader.GetDecimal(7) : null;
-            order.ShipName = (!dataReader.IsDBNull(8)) ? dataReader.GetString(8): null;
-            order.ShipAddress = (!dataReader.IsDBNull(9)) ? dataReader.GetString(9) : null;
-            order.ShipCity = (!dataReader.IsDBNull(10)) ? dataReader.GetString(10) : null;
-            order.ShipRegion = (!dataReader.IsDBNull(11)) ? dataReader.GetString(11) : null;
-            order.ShipPostalCode = (!dataReader.IsDBNull(12)) ? dataReader.GetString(12) : null;
-            order.ShipCountry = (!dataReader.IsDBNull(13)) ? dataReader.GetString(13) : null;
+            order.OrderDate = (!dataReader.IsDBNull(1)) ? (DateTime?)dataReader.GetDateTime(1) : null;
+            order.ShippedDate = (!dataReader.IsDBNull(2)) ? (DateTime?)dataReader.GetDateTime(2) : null;
 
             if (order.OrderDate == null)
             {
