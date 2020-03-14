@@ -137,31 +137,6 @@ namespace DataAccessLayer
             return order;
         }
 
-        private Order MapOrder(DbDataReader dataReader)
-        {
-            var order = new Order();
-
-            order.OrderId = dataReader.GetInt32(0);
-            order.OrderDate = (!dataReader.IsDBNull(1)) ? (DateTime?)dataReader.GetDateTime(1) : null;
-            order.RequiredDate = (!dataReader.IsDBNull(2)) ? (DateTime?)dataReader.GetDateTime(2) : null;
-            order.ShippedDate = (!dataReader.IsDBNull(3)) ? (DateTime?)dataReader.GetDateTime(3) : null;
-
-            if (order.OrderDate == null)
-            {
-                order.Status = OrderStatus.New;
-            }
-            else if(order.ShippedDate == null)
-            {
-                order.Status = OrderStatus.InProgress;
-            }
-            else
-            {
-                order.Status = OrderStatus.Shipped;
-            }
-
-            return order;
-        }
-
         public Order Delete(int id)
         {
             var order = GetDetailedOrder(id);
@@ -191,6 +166,87 @@ namespace DataAccessLayer
 
             command.Dispose();
             connection.Close();
+
+            return order;
+        }
+
+        public Order SetOrderedDate(Order order)
+        {
+            var connection = providerFactory.CreateConnection();
+            connection.ConnectionString = connectionString;
+
+            connection.Open();
+
+            var command = connection.CreateCommand();
+
+            command.CommandText = "update orders set orderdate = getdate() where orderid = @id ";
+
+            var param = command.CreateParameter();
+            param.ParameterName = "@id";
+            param.Value = order.OrderId;
+
+            command.Parameters.Add(param);
+
+            command.ExecuteNonQuery();
+
+            order.OrderDate = DateTime.Now;
+            order.Status = OrderStatus.InProgress;
+
+            command.Dispose();
+            connection.Close();
+
+            return order;
+        }
+
+        public Order SetDone(Order order)
+        {
+            var connection = providerFactory.CreateConnection();
+            connection.ConnectionString = connectionString;
+
+            connection.Open();
+
+            var command = connection.CreateCommand();
+
+            command.CommandText = "update orders set shippeddate = getdate() where orderid = @id ";
+
+            var param = command.CreateParameter();
+            param.ParameterName = "@id";
+            param.Value = order.OrderId;
+
+            command.Parameters.Add(param);
+
+            command.ExecuteNonQuery();
+
+            order.ShippedDate = DateTime.Now;
+            order.Status = OrderStatus.Shipped;
+
+            command.Dispose();
+            connection.Close();
+
+            return order;
+        }
+
+        private Order MapOrder(DbDataReader dataReader)
+        {
+            var order = new Order();
+
+            order.OrderId = dataReader.GetInt32(0);
+            order.OrderDate = (!dataReader.IsDBNull(1)) ? (DateTime?)dataReader.GetDateTime(1) : null;
+            order.RequiredDate = (!dataReader.IsDBNull(2)) ? (DateTime?)dataReader.GetDateTime(2) : null;
+            order.ShippedDate = (!dataReader.IsDBNull(3)) ? (DateTime?)dataReader.GetDateTime(3) : null;
+
+            if (order.OrderDate == null)
+            {
+                order.Status = OrderStatus.New;
+            }
+            else if (order.ShippedDate == null)
+            {
+                order.Status = OrderStatus.InProgress;
+            }
+            else
+            {
+                order.Status = OrderStatus.Shipped;
+            }
 
             return order;
         }

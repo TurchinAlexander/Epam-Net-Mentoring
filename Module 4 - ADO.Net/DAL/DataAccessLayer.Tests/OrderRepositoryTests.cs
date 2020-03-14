@@ -72,5 +72,27 @@ namespace DataAccessLayer.Tests
 
             Assert.True(updatedOrder.OrderId == deletedOrder.OrderId);
         }
+
+        [Test]
+        public void SetOrdered_OrderStatusIsChangedToOrdered()
+        {
+            var order = orderRepository.Add(new Order());
+
+            var updatedOrder = orderRepository.SetOrderedDate(order);
+
+            Assert.True(updatedOrder.OrderDate != null
+                        && updatedOrder.Status == OrderStatus.InProgress);
+        }
+
+        [Test]
+        public void SetDone_OrderStatusIsChangedToShipped()
+        {
+            var order = orderRepository.Add(new Order());
+
+            var updatedOrder = orderRepository.SetDone(order);
+
+            Assert.True(updatedOrder.ShippedDate != null
+                        && updatedOrder.Status == OrderStatus.Shipped);
+        }
     }
 }
