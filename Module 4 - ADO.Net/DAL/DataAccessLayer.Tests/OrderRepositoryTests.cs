@@ -30,7 +30,7 @@ namespace DataAccessLayer.Tests
         [Test]
         public void GetOrders_Nothing_EnumerableListOfOrders()
         {
-            var result = orderRepository.GetOrders()
+            var result = orderRepository.GetAll()
                 .ToList();
 
             Assert.True(result.Count > 0);
@@ -39,7 +39,7 @@ namespace DataAccessLayer.Tests
         [Test]
         public void GetDetailedOrder_Nothing_OrderWithProducts()
         {
-            var result = orderRepository.GetDetailedOrder(10248);
+            var result = orderRepository.Get(10248);
 
             Assert.True(result != null);
             Assert.True(result.Products.Count > 0);
@@ -59,7 +59,7 @@ namespace DataAccessLayer.Tests
         [Test]
         public void ChangeOrder_InvalidOperationException()
         {
-            var order = orderRepository.GetDetailedOrder(10248);
+            var order = orderRepository.Get(10248);
 
             Assert.Throws<InvalidOperationException>(() => order.OrderId = 10);
         }
@@ -80,10 +80,10 @@ namespace DataAccessLayer.Tests
         {
             var order = orderRepository.Add(new Order());
 
-            var updatedOrder = orderRepository.SetOrderedDate(order);
+            var updatedOrder = orderRepository.SetOrderedDate(order.OrderId);
 
             Assert.True(updatedOrder.OrderDate != null
-                        && updatedOrder.Status == OrderStatus.InProgress);
+                        && updatedOrder.GetStatus() == OrderStatus.InProgress);
         }
 
         [Test]
@@ -91,11 +91,11 @@ namespace DataAccessLayer.Tests
         {
             var order = orderRepository.Add(new Order());
 
-            Order updatedOrder = orderRepository.SetOrderedDate(order);
-            updatedOrder = orderRepository.SetDone(updatedOrder);
+            Order updatedOrder = orderRepository.SetOrderedDate(order.OrderId);
+            updatedOrder = orderRepository.SetDone(updatedOrder.OrderId);
 
             Assert.True(updatedOrder.ShippedDate != null
-                        && updatedOrder.Status == OrderStatus.Shipped);
+                        && updatedOrder.GetStatus() == OrderStatus.Shipped);
         }
 
         [Test]

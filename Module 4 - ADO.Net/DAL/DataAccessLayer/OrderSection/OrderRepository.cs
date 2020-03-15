@@ -21,22 +21,8 @@ namespace DataAccessLayer.OrderSection
             connection.ConnectionString = connectionString;
         }
 
-        public Order Add(Order order)
-        {
-            var command = StartExecution();
 
-            command.CommandText = "insert into orders (requireddate) values (getdate());" +
-                                  "select @@IDENTITY;";
-
-            order.OrderId = Convert.ToInt32(command.ExecuteScalar());
-            order.RequiredDate = DateTime.Now;
-
-            EndExecution(command);
-
-            return order;
-        }
-
-        public IEnumerable<Order> GetOrders()
+        public IEnumerable<Order> GetAll()
         {
             var orders = new List<Order>();
 
@@ -51,25 +37,30 @@ namespace DataAccessLayer.OrderSection
                 " FROM [Northwind].[dbo].[Orders]";
             command.CommandType = CommandType.Text;
 
-            var dataReader = command.ExecuteReader();
-            if (!dataReader.HasRows)
+            DbDataAdapter dataAdapter = providerFactory.CreateDataAdapter();
+
+            dataAdapter.SelectCommand = command;
+            DataTable table = new DataTable();
+
+            dataAdapter.Fill(table);
+
+            foreach (DataRow row in table.Rows)
             {
-                return null;
+                orders.Add(Mapper.Map<Order>(row));
             }
+
             
-            while (dataReader.Read())
-            {
-                orders.Add(Mapper.ToOrder(dataReader));
-            }
-            
-            dataReader.Close();
+            //dataReader.Close();
             EndExecution(command);
 
             return orders;
         }
 
-        public Order GetDetailedOrder(int id)
+        public Order Get(int id)
         {
+            const int orderTable = 0;
+            const int productTable = 1;
+
             var command = StartExecution();
 
             command.CommandText =
@@ -99,34 +90,54 @@ namespace DataAccessLayer.OrderSection
 
             command.Parameters.Add(paramId);
 
-            var dataReader = command.ExecuteReader();
-            if (!dataReader.HasRows)
+            var dataAdapter = providerFactory.CreateDataAdapter();
+            DataSet dataSet = new DataSet();
+
+            dataAdapter.SelectCommand = command;
+            dataAdapter.Fill(dataSet);
+
+            if (dataSet.Tables[orderTable].Rows.Count == 0)
             {
                 return null;
             }
 
-            dataReader.Read();
-            var order = Mapper.ToOrder(dataReader);
+            var order = Mapper.Map<Order>(dataSet.Tables[orderTable].Rows[0]);
 
-            dataReader.NextResult();
-            order.Products = new List<Product>();
-
-            while (dataReader.Read())
+            if (dataSet.Tables[productTable].Rows.Count > 0)
             {
-                order.Products.Add(Mapper.ToProduct(dataReader));
+                order.Products = new List<Product>();
+
+                foreach (DataRow row in dataSet.Tables[productTable].Rows)
+                {
+                    order.Products.Add(Mapper.Map<Product>(row));
+                }
             }
 
-            dataReader.Close();
             EndExecution(command);
 
             return order;
         }
 
+        public Order Add(Order order)
+        {
+            var command = StartExecution();
+
+            command.CommandText = "insert into orders (requireddate) values (getdate());" +
+                                  "select @@IDENTITY;";
+
+            var orderId = Convert.ToInt32(command.ExecuteScalar());
+
+            EndExecution(command);
+
+            return Get(orderId);
+        }
+
+
         public Order Delete(int id)
         {
-            var order = GetDetailedOrder(id);
+            var order = Get(id);
 
-            if (order.Status == OrderStatus.Shipped)
+            if (order.GetStatus() == OrderStatus.Shipped)
             {
                 return order;
             }
@@ -147,41 +158,11 @@ namespace DataAccessLayer.OrderSection
             return order;
         }
 
-        public Order SetOrderedDate(Order order)
-        {
-            var command = StartExecution();
+        public Order SetOrderedDate(int orderId) =>
+            UpdateStatus("UPDATE Orders SET OrderDate = GETDATE() WHERE OrderId = @id", orderId);
 
-            command.CommandText = "update orders set orderdate = getdate() where orderid = @id ";
-
-            var param = command.CreateParameter();
-            param.ParameterName = "@id";
-            param.Value = order.OrderId;
-
-            command.Parameters.Add(param);
-            command.ExecuteNonQuery();
-
-            EndExecution(command);
-
-            return GetDetailedOrder(order.OrderId);
-        }
-
-        public Order SetDone(Order order)
-        {
-            var command = StartExecution();
-
-            command.CommandText = "update orders set shippeddate = getdate() where orderid = @id ";
-
-            var param = command.CreateParameter();
-            param.ParameterName = "@id";
-            param.Value = order.OrderId;
-
-            command.Parameters.Add(param);
-            command.ExecuteNonQuery();
-
-            EndExecution(command);
-
-            return GetDetailedOrder(order.OrderId);
-        }
+        public Order SetDone(int orderId) =>
+            UpdateStatus("UPDATE Orders SET ShippedDate = GETDATE() WHERE OrderId = @id ", orderId);
 
         public IEnumerable<CustomerOrderDetails> GetCustomerOrderDetails(int orderId)
         {
@@ -195,17 +176,19 @@ namespace DataAccessLayer.OrderSection
             orderIdParam.ParameterName = "@OrderID";
             orderIdParam.Value = orderId;
 
-            
             command.Parameters.Add(orderIdParam);
 
-            var dataReader = command.ExecuteReader();
+            DbDataAdapter dataAdapter = providerFactory.CreateDataAdapter();
+            DataTable table = new DataTable();
 
-            while (dataReader.Read())
+            dataAdapter.SelectCommand = command;
+            dataAdapter.Fill(table);
+
+            foreach (DataRow row in table.Rows)
             {
-                customerOrderDetails.Add(Mapper.ToCustomerOrderDetails(dataReader));
+                customerOrderDetails.Add(Mapper.Map<CustomerOrderDetails>(row));
             }
-           
-            dataReader.Close();
+
             EndExecution(command);
 
             return customerOrderDetails;
@@ -216,23 +199,26 @@ namespace DataAccessLayer.OrderSection
             var customerOrderHistory = new List<CustomerOrderHistory>();
             var command = StartExecution();
 
-            command.CommandText = "[dbo].[CustOrderHist]";
+            command.CommandText = "[dbo].[CustOrderHist] @CustomerID = @customerId";
             command.CommandType = CommandType.StoredProcedure;
 
             var customerIdParam = command.CreateParameter();
-            customerIdParam.ParameterName = "@CustomerID";
+            customerIdParam.ParameterName = "@customerId";
             customerIdParam.Value = customerId;
 
             command.Parameters.Add(customerIdParam);
 
-            var dataReader = command.ExecuteReader();
+            DbDataAdapter dataAdapter = providerFactory.CreateDataAdapter();
+            DataTable table = new DataTable();
 
-            while (dataReader.Read())
+            dataAdapter.SelectCommand = command;
+            dataAdapter.Fill(table);
+
+            foreach (DataRow row in table.Rows)
             {
-                customerOrderHistory.Add(Mapper.ToCustomerOrderHistory(dataReader));
+                customerOrderHistory.Add(Mapper.Map<CustomerOrderHistory>(row));
             }
 
-            dataReader.Close();
             EndExecution(command);
 
             return customerOrderHistory;
@@ -251,65 +237,22 @@ namespace DataAccessLayer.OrderSection
             connection.Close();
         }
 
-        private static class Mapper
+        private Order UpdateStatus(string commandText, int orderId)
         {
-            public static Order ToOrder(DbDataReader dataReader)
-            {
-                var order = new Order();
+            var command = StartExecution();
 
-                order.OrderId = dataReader.GetInt32(0);
-                order.OrderDate = (!dataReader.IsDBNull(1)) ? (DateTime?)dataReader.GetDateTime(1) : null;
-                order.RequiredDate = (!dataReader.IsDBNull(2)) ? (DateTime?)dataReader.GetDateTime(2) : null;
-                order.ShippedDate = (!dataReader.IsDBNull(3)) ? (DateTime?)dataReader.GetDateTime(3) : null;
+            command.CommandText = commandText;
 
-                if (order.OrderDate == null)
-                {
-                    order.Status = OrderStatus.New;
-                }
-                else if (order.ShippedDate == null)
-                {
-                    order.Status = OrderStatus.InProgress;
-                }
-                else
-                {
-                    order.Status = OrderStatus.Shipped;
-                }
+            var param = command.CreateParameter();
+            param.ParameterName = "@id";
+            param.Value = orderId;
 
-                return order;
-            }
+            command.Parameters.Add(param);
+            command.ExecuteNonQuery();
 
-            public static Product ToProduct(DbDataReader dataReader)
-            {
-                var product = new Product();
+            EndExecution(command);
 
-                product.ProductId = dataReader.GetInt32(0);
-                product.ProductName = dataReader.GetString(1);
-
-                return product;
-            }
-
-            public static CustomerOrderDetails ToCustomerOrderDetails(DbDataReader dataReader)
-            {
-                var result = new CustomerOrderDetails();
-
-                result.ProductName = dataReader.GetString(0);
-                result.UnitPrice = dataReader.GetDecimal(1);
-                result.Quantity = dataReader.GetInt16(2);
-                result.Discount = dataReader.GetInt32(3);
-                result.ExtendedPrice = dataReader.GetDecimal(4);
-
-                return result;
-            }
-
-            public static CustomerOrderHistory ToCustomerOrderHistory(DbDataReader dataReader)
-            {
-                var result = new CustomerOrderHistory();
-
-                result.ProductName = dataReader.GetString(0);
-                result.Total = dataReader.GetInt32(1);
-
-                return result;
-            }
+            return Get(orderId);
         }
     }
 }

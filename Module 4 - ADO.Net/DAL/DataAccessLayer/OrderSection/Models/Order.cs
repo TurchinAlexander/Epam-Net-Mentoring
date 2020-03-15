@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DataAccessLayer.Attributes;
 
 namespace DataAccessLayer.OrderSection.Models
 {
@@ -24,13 +25,27 @@ namespace DataAccessLayer.OrderSection.Models
 
         public DateTime? ShippedDate { get; internal set; }
 
-        public OrderStatus Status { get; internal set; }
-
         public ICollection<Product> Products { get; set; }
+
+        public OrderStatus GetStatus()
+        {
+            if (OrderDate == null)
+            {
+                return OrderStatus.New;
+            }
+
+            if (ShippedDate == null)
+            {
+                return OrderStatus.InProgress;
+            }
+
+            return OrderStatus.Shipped;
+            
+        }
 
         private void CanChange()
         {
-            if (Status != OrderStatus.New)
+            if (GetStatus() != OrderStatus.New)
             {
                 throw new InvalidOperationException();
             }
