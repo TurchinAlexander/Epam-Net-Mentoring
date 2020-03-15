@@ -2,29 +2,28 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using DataAccessLayer.OrderSection.Models;
 
-namespace DataAccessLayer
+namespace DataAccessLayer.OrderSection
 {
     public class OrderRepository
     {
         private readonly DbProviderFactory providerFactory;
         private readonly string connectionString;
-        
+        private readonly DbConnection connection;
+
         public OrderRepository(DbProviderFactory providerFactory, string connectionString)
         {
             this.providerFactory = providerFactory ?? throw new ArgumentNullException(nameof(providerFactory));
             this.connectionString = connectionString ?? throw new ArgumentNullException(nameof(providerFactory));
+
+            connection = providerFactory.CreateConnection();
+            connection.ConnectionString = connectionString;
         }
 
         public Order Add(Order order)
         {
-            var orders = new List<Order>();
-            var connection = providerFactory.CreateConnection();
-            connection.ConnectionString = connectionString;
-
-            connection.Open();
-
-            var command = connection.CreateCommand();
+            var command = StartExecution();
 
             command.CommandText = "insert into orders (requireddate) values (getdate());" +
                                   "select @@IDENTITY;";
@@ -32,8 +31,7 @@ namespace DataAccessLayer
             order.OrderId = Convert.ToInt32(command.ExecuteScalar());
             order.RequiredDate = DateTime.Now;
 
-            command.Dispose();
-            connection.Close();
+            EndExecution(command);
 
             return order;
         }
@@ -41,12 +39,8 @@ namespace DataAccessLayer
         public IEnumerable<Order> GetOrders()
         {
             var orders = new List<Order>();
-            var connection = providerFactory.CreateConnection();
-            connection.ConnectionString = connectionString;
 
-            connection.Open();
-
-            var command = connection.CreateCommand();
+            var command = StartExecution();
 
             command.CommandText =
                 "SELECT " +
@@ -65,26 +59,18 @@ namespace DataAccessLayer
             
             while (dataReader.Read())
             {
-                var order = MapOrder(dataReader);
-                
-                orders.Add(order);
+                orders.Add(Mapper.ToOrder(dataReader));
             }
             
             dataReader.Close();
-            command.Dispose();
-            connection.Close();
+            EndExecution(command);
 
             return orders;
         }
 
         public Order GetDetailedOrder(int id)
         {
-            var connection = providerFactory.CreateConnection();
-            connection.ConnectionString = connectionString;
-
-            connection.Open();
-
-            var command = connection.CreateCommand();
+            var command = StartExecution();
 
             command.CommandText =
                 "SELECT " +
@@ -107,11 +93,11 @@ namespace DataAccessLayer
                 " P.ProductName;";
             command.CommandType = CommandType.Text;
 
-            var param = command.CreateParameter();
-            param.ParameterName = "@id";
-            param.Value = id;
+            var paramId = command.CreateParameter();
+            paramId.ParameterName = "@id";
+            paramId.Value = id;
 
-            command.Parameters.Add(param);
+            command.Parameters.Add(paramId);
 
             var dataReader = command.ExecuteReader();
             if (!dataReader.HasRows)
@@ -120,19 +106,18 @@ namespace DataAccessLayer
             }
 
             dataReader.Read();
-            var order = MapOrder(dataReader);
+            var order = Mapper.ToOrder(dataReader);
 
             dataReader.NextResult();
             order.Products = new List<Product>();
 
             while (dataReader.Read())
             {
-                order.Products.Add(MapProduct(dataReader));
+                order.Products.Add(Mapper.ToProduct(dataReader));
             }
 
             dataReader.Close();
-            command.Dispose();
-            connection.Close();
+            EndExecution(command);
 
             return order;
         }
@@ -146,13 +131,7 @@ namespace DataAccessLayer
                 return order;
             }
 
-            var orders = new List<Order>();
-            var connection = providerFactory.CreateConnection();
-            connection.ConnectionString = connectionString;
-
-            connection.Open();
-
-            var command = connection.CreateCommand();
+            var command = StartExecution();
 
             command.CommandText = "delete orders where orderID = @id";
 
@@ -161,23 +140,16 @@ namespace DataAccessLayer
             param.Value = id;
 
             command.Parameters.Add(param);
-
             command.ExecuteNonQuery();
 
-            command.Dispose();
-            connection.Close();
+            EndExecution(command);
 
             return order;
         }
 
         public Order SetOrderedDate(Order order)
         {
-            var connection = providerFactory.CreateConnection();
-            connection.ConnectionString = connectionString;
-
-            connection.Open();
-
-            var command = connection.CreateCommand();
+            var command = StartExecution();
 
             command.CommandText = "update orders set orderdate = getdate() where orderid = @id ";
 
@@ -186,26 +158,16 @@ namespace DataAccessLayer
             param.Value = order.OrderId;
 
             command.Parameters.Add(param);
-
             command.ExecuteNonQuery();
 
-            order.OrderDate = DateTime.Now;
-            order.Status = OrderStatus.InProgress;
+            EndExecution(command);
 
-            command.Dispose();
-            connection.Close();
-
-            return order;
+            return GetDetailedOrder(order.OrderId);
         }
 
         public Order SetDone(Order order)
         {
-            var connection = providerFactory.CreateConnection();
-            connection.ConnectionString = connectionString;
-
-            connection.Open();
-
-            var command = connection.CreateCommand();
+            var command = StartExecution();
 
             command.CommandText = "update orders set shippeddate = getdate() where orderid = @id ";
 
@@ -214,46 +176,37 @@ namespace DataAccessLayer
             param.Value = order.OrderId;
 
             command.Parameters.Add(param);
-
             command.ExecuteNonQuery();
 
-            order.ShippedDate = DateTime.Now;
-            order.Status = OrderStatus.Shipped;
+            EndExecution(command);
 
-            command.Dispose();
-            connection.Close();
-
-            return order;
+            return GetDetailedOrder(order.OrderId);
         }
 
         public IEnumerable<CustomerOrderDetails> GetCustomerOrderDetails(int orderId)
         {
             var customerOrderDetails = new List<CustomerOrderDetails>();
-            var connection = providerFactory.CreateConnection();
-            connection.ConnectionString = connectionString;
+            var command = StartExecution();
 
-            connection.Open();
-
-            var command = connection.CreateCommand();
             command.CommandText = "[dbo].[CustOrdersDetail]";
+            command.CommandType = CommandType.StoredProcedure;
 
             var orderIdParam = command.CreateParameter();
             orderIdParam.ParameterName = "@OrderID";
             orderIdParam.Value = orderId;
 
-            command.CommandType = CommandType.StoredProcedure;
+            
             command.Parameters.Add(orderIdParam);
 
             var dataReader = command.ExecuteReader();
 
             while (dataReader.Read())
             {
-                customerOrderDetails.Add(MapCustomerOrderDetails(dataReader));
+                customerOrderDetails.Add(Mapper.ToCustomerOrderDetails(dataReader));
             }
            
             dataReader.Close();
-            command.Dispose();
-            connection.Close();
+            EndExecution(command);
 
             return customerOrderDetails;
         }
@@ -261,91 +214,102 @@ namespace DataAccessLayer
         public IEnumerable<CustomerOrderHistory> GetCustomerOrderHistory(string customerId)
         {
             var customerOrderHistory = new List<CustomerOrderHistory>();
-            var connection = providerFactory.CreateConnection();
-            connection.ConnectionString = connectionString;
+            var command = StartExecution();
 
-            connection.Open();
-
-            var command = connection.CreateCommand();
             command.CommandText = "[dbo].[CustOrderHist]";
+            command.CommandType = CommandType.StoredProcedure;
 
             var customerIdParam = command.CreateParameter();
             customerIdParam.ParameterName = "@CustomerID";
             customerIdParam.Value = customerId;
 
-            command.CommandType = CommandType.StoredProcedure;
             command.Parameters.Add(customerIdParam);
 
             var dataReader = command.ExecuteReader();
 
             while (dataReader.Read())
             {
-                customerOrderHistory.Add(MapCustomerOrderHistory(dataReader));
+                customerOrderHistory.Add(Mapper.ToCustomerOrderHistory(dataReader));
             }
 
             dataReader.Close();
-            command.Dispose();
-            connection.Close();
+            EndExecution(command);
 
             return customerOrderHistory;
         }
 
-        private Order MapOrder(DbDataReader dataReader)
+        private DbCommand StartExecution()
         {
-            var order = new Order();
+            connection.Open();
 
-            order.OrderId = dataReader.GetInt32(0);
-            order.OrderDate = (!dataReader.IsDBNull(1)) ? (DateTime?)dataReader.GetDateTime(1) : null;
-            order.RequiredDate = (!dataReader.IsDBNull(2)) ? (DateTime?)dataReader.GetDateTime(2) : null;
-            order.ShippedDate = (!dataReader.IsDBNull(3)) ? (DateTime?)dataReader.GetDateTime(3) : null;
-
-            if (order.OrderDate == null)
-            {
-                order.Status = OrderStatus.New;
-            }
-            else if (order.ShippedDate == null)
-            {
-                order.Status = OrderStatus.InProgress;
-            }
-            else
-            {
-                order.Status = OrderStatus.Shipped;
-            }
-
-            return order;
+            return connection.CreateCommand();
         }
 
-        private Product MapProduct(DbDataReader dataReader)
+        private void EndExecution(DbCommand command)
         {
-            var product = new Product();
-
-            product.ProductId = dataReader.GetInt32(0);
-            product.ProductName = dataReader.GetString(1);
-
-            return product;
+            command.Dispose();
+            connection.Close();
         }
 
-        private CustomerOrderDetails MapCustomerOrderDetails(DbDataReader dataReader)
+        private static class Mapper
         {
-            var result = new CustomerOrderDetails();
+            public static Order ToOrder(DbDataReader dataReader)
+            {
+                var order = new Order();
 
-            result.ProductName = dataReader.GetString(0);
-            result.UnitPrice = dataReader.GetDecimal(1);
-            result.Quantity = dataReader.GetInt16(2);
-            result.Discount = dataReader.GetInt32(3);
-            result.ExtendedPrice = dataReader.GetDecimal(4);
+                order.OrderId = dataReader.GetInt32(0);
+                order.OrderDate = (!dataReader.IsDBNull(1)) ? (DateTime?)dataReader.GetDateTime(1) : null;
+                order.RequiredDate = (!dataReader.IsDBNull(2)) ? (DateTime?)dataReader.GetDateTime(2) : null;
+                order.ShippedDate = (!dataReader.IsDBNull(3)) ? (DateTime?)dataReader.GetDateTime(3) : null;
 
-            return result;
-        }
+                if (order.OrderDate == null)
+                {
+                    order.Status = OrderStatus.New;
+                }
+                else if (order.ShippedDate == null)
+                {
+                    order.Status = OrderStatus.InProgress;
+                }
+                else
+                {
+                    order.Status = OrderStatus.Shipped;
+                }
 
-        private CustomerOrderHistory MapCustomerOrderHistory(DbDataReader dataReader)
-        {
-            var result = new CustomerOrderHistory();
+                return order;
+            }
 
-            result.ProductName = dataReader.GetString(0);
-            result.Total = dataReader.GetInt32(1);
+            public static Product ToProduct(DbDataReader dataReader)
+            {
+                var product = new Product();
 
-            return result;
+                product.ProductId = dataReader.GetInt32(0);
+                product.ProductName = dataReader.GetString(1);
+
+                return product;
+            }
+
+            public static CustomerOrderDetails ToCustomerOrderDetails(DbDataReader dataReader)
+            {
+                var result = new CustomerOrderDetails();
+
+                result.ProductName = dataReader.GetString(0);
+                result.UnitPrice = dataReader.GetDecimal(1);
+                result.Quantity = dataReader.GetInt16(2);
+                result.Discount = dataReader.GetInt32(3);
+                result.ExtendedPrice = dataReader.GetDecimal(4);
+
+                return result;
+            }
+
+            public static CustomerOrderHistory ToCustomerOrderHistory(DbDataReader dataReader)
+            {
+                var result = new CustomerOrderHistory();
+
+                result.ProductName = dataReader.GetString(0);
+                result.Total = dataReader.GetInt32(1);
+
+                return result;
+            }
         }
     }
 }

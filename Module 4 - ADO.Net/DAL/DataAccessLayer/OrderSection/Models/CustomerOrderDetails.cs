@@ -1,4 +1,4 @@
-﻿namespace DataAccessLayer
+﻿namespace DataAccessLayer.OrderSection.Models
 {
     public class CustomerOrderDetails
     {

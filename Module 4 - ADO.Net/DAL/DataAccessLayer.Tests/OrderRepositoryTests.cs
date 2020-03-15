@@ -4,6 +4,8 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
+using DataAccessLayer.OrderSection;
+using DataAccessLayer.OrderSection.Models;
 using NUnit.Framework;
 
 namespace DataAccessLayer.Tests
@@ -89,7 +91,8 @@ namespace DataAccessLayer.Tests
         {
             var order = orderRepository.Add(new Order());
 
-            var updatedOrder = orderRepository.SetDone(order);
+            Order updatedOrder = orderRepository.SetOrderedDate(order);
+            updatedOrder = orderRepository.SetDone(updatedOrder);
 
             Assert.True(updatedOrder.ShippedDate != null
                         && updatedOrder.Status == OrderStatus.Shipped);
