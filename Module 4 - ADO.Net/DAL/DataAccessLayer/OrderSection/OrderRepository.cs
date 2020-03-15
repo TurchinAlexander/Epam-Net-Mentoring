@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using DataAccessLayer.Interfaces;
 using DataAccessLayer.OrderSection.Models;
+using Microsoft.VisualBasic.FileIO;
 
 namespace DataAccessLayer.OrderSection
 {
-    public class OrderRepository
+    public class OrderRepository : IOrderRepository
     {
         private readonly DbProviderFactory providerFactory;
         private readonly string connectionString;
@@ -199,11 +201,11 @@ namespace DataAccessLayer.OrderSection
             var customerOrderHistory = new List<CustomerOrderHistory>();
             var command = StartExecution();
 
-            command.CommandText = "[dbo].[CustOrderHist] @CustomerID = @customerId";
+            command.CommandText = "[dbo].[CustOrderHist]";
             command.CommandType = CommandType.StoredProcedure;
 
             var customerIdParam = command.CreateParameter();
-            customerIdParam.ParameterName = "@customerId";
+            customerIdParam.ParameterName = "@CustomerID";
             customerIdParam.Value = customerId;
 
             command.Parameters.Add(customerIdParam);
