@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Configuration;
-using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
+using DataAccessLayer.Interfaces;
 using DataAccessLayer.OrderSection;
 using DataAccessLayer.OrderSection.Models;
 using NUnit.Framework;
@@ -18,7 +17,7 @@ namespace DataAccessLayer.Tests
         private static string connectionString =
             @"Server=DESKTOP-J66IAL7\SQLEXPRESS;Database=Northwind;Trusted_Connection = true";
 
-        private static OrderRepository orderRepository;
+        private static IOrderRepository orderRepository;
 
 
         [SetUp]
@@ -52,8 +51,8 @@ namespace DataAccessLayer.Tests
 
             var updatedOrder = orderRepository.Add(order);
 
-            Assert.True(order.OrderId > 0);
-            Assert.True(order.RequiredDate.HasValue);
+            Assert.True(updatedOrder.OrderId > 0);
+            Assert.True(updatedOrder.RequiredDate.HasValue);
         }
 
         [Test]
