@@ -114,7 +114,7 @@ namespace SampleQueries
 
         [Category("Tasks")]
         [Title("Task 4.")]
-        [Description("Show customers and their date when he became it.")]
+        [Description("Show customers and their date when they became it.")]
         public void Linq4()
         {
             var results = dataSource.Customers
@@ -124,6 +124,29 @@ namespace SampleQueries
                     Customer = c,
                     Date = c.Orders.Min(o => o.OrderDate)
                 });
+
+            foreach (var result in results)
+            {
+                ObjectDumper.Write($"Customer - {result.Customer.CustomerID}, Date - {result.Date.Month}/{result.Date.Year}");
+            }
+        }
+
+        [Category("Tasks")]
+        [Title("Task 5.")]
+        [Description("Show customers and their date when he became it. Show them in sorted order.")]
+        public void Linq5()
+        {
+            var results = dataSource.Customers
+                .Where(c => c.Orders.Length > 0)
+                .Select(c => new
+                {
+                    Customer = c,
+                    Date = c.Orders.Min(o => o.OrderDate)
+                })
+                .OrderBy(c => c.Date.Year)
+                .ThenBy(c => c.Date.Month)
+                .ThenByDescending(c => c.Customer.Orders.Sum(o => o.Total))
+                .ThenBy(c => c.Customer.CompanyName);
 
             foreach (var result in results)
             {
