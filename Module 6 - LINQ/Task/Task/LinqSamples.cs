@@ -235,7 +235,7 @@ namespace SampleQueries
 
         [Category("Tasks")]
         [Title("Task 9.")]
-        [Description("Calculate average profit and intencity of each city.")]
+        [Description("Calculate average profit and intensity of each city.")]
         public void Linq9()
         {
             var results = dataSource.Customers
@@ -249,6 +249,52 @@ namespace SampleQueries
             foreach (var result in results)
             {
                 ObjectDumper.Write($"City - {result.City}, Profit - {result.Profit}, Intensity - {result.Intensity}");
+            }
+        }
+
+        [Category("Tasks")]
+        [Title("Task 10.")]
+        [Description("Calculate annual statistics of customers' activity'")]
+        public void Linq10()
+        {
+            var results = dataSource.Customers
+                .Select(c => new
+                {
+                    Customer = c,
+                    MonthData = c.Orders
+                        .GroupBy(o => o.OrderDate.Month)
+                        .OrderBy(o => o.Key),
+                    YearData = c.Orders
+                        .GroupBy(o => o.OrderDate.Year)
+                        .OrderBy(o => o.Key),
+                    YearMonthData = c.Orders
+                        .GroupBy(o => new {o.OrderDate.Month, o.OrderDate.Year})
+                        .OrderBy(o => o.Key.Year)
+                        .ThenBy(o => o.Key.Month)
+                });
+
+            foreach (var result in results)
+            {
+                ObjectDumper.Write($"Customer - {result.Customer.CompanyName}");
+                
+                foreach (var month in result.MonthData)
+                {
+                    ObjectDumper.Write($"  Month - {month.Key} Order Count - {month.Count()}");
+                }
+
+                ObjectDumper.Write("");
+
+                foreach (var year in result.YearData)
+                {
+                    ObjectDumper.Write($"  Year - {year.Key} Order Count - {year.Count()}");
+                }
+
+                ObjectDumper.Write("");
+
+                foreach (var monthYear in result.YearMonthData)
+                {
+                    ObjectDumper.Write($"  Year - {monthYear.Key.Year} Month - {monthYear.Key.Month} Order Count - {monthYear.Count()}");
+                }
             }
         }
     }
