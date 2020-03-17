@@ -232,5 +232,24 @@ namespace SampleQueries
                 }
             }
         }
+
+        [Category("Tasks")]
+        [Title("Task 9.")]
+        [Description("Calculate average profit and intencity of each city.")]
+        public void Linq9()
+        {
+            var results = dataSource.Customers
+                .GroupBy(c => c.City, (city, customers) => new
+                {
+                    City = city,
+                    Profit = customers.Average(cust => cust.Orders.Sum(o => o.Total)),
+                    Intensity = customers.Sum(cust => cust.Orders.Length) / customers.Count()
+                });
+
+            foreach (var result in results)
+            {
+                ObjectDumper.Write($"City - {result.City}, Profit - {result.Profit}, Intensity - {result.Intensity}");
+            }
+        }
     }
 }
