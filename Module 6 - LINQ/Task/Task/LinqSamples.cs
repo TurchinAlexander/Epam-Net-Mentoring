@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using SampleSupport;
@@ -53,6 +54,81 @@ namespace SampleQueries
             }
         }
 
-		
+        [Category("Tasks")]
+        [Title("Task 2")]
+        [Description("For every customer show a list of employees which lives in the same city as the customer.")]
+        public void Linq2()
+        {
+            var results = dataSource.Customers
+                .Select(c => new
+                {
+                    CustomerId = c.CustomerID,
+                    Suppliers = dataSource.Suppliers
+                        .Where(s => s.Country == c.Country 
+                                    && s.City == c.City)
+                });
+
+            foreach (var result in results)
+            {
+                ObjectDumper.Write($"CustomerId - {result.CustomerId}, Suppliers - {string.Join(", ", result.Suppliers.Select(s => s.SupplierName))}");
+            }
+        }
+
+        [Category("Tasks")]
+        [Title("Task 2. Using grouping.")]
+        [Description("For every customer show a list of employees which lives in the same city as the customer.")]
+        public void Linq2Group()
+        {
+            var groupResults = dataSource.Customers
+                .GroupJoin(
+                    dataSource.Suppliers,
+                    c => new { c.Country, c.City },
+                    s => new { s.Country, s.City },
+                    (c, s) => new
+                    {
+                        Customer = c,
+                        Suppliers = s
+                    });
+
+            foreach (var result in groupResults)
+            {
+                ObjectDumper.Write($"CustomerId - {result.Customer.CustomerID}, Suppliers - {string.Join(", ", result.Suppliers.Select(s => s.SupplierName))}");
+            }
+        }
+
+        [Category("Tasks")]
+        [Title("Task 3.")]
+        [Description("Show all customers which have at least one order which total is more than the specified value.")]
+        public void Linq3()
+        {
+            var totalLimit = 1000;
+
+            var results = dataSource.Customers
+                .Where(c => c.Orders.Any(o => o.Total > totalLimit));
+
+            foreach (var result in results)
+            {
+                ObjectDumper.Write($"Customer - {result.CompanyName}");
+            }
+        }
+
+        [Category("Tasks")]
+        [Title("Task 4.")]
+        [Description("Show customers and their date when he became it.")]
+        public void Linq4()
+        {
+            var results = dataSource.Customers
+                .Where(c => c.Orders.Length > 0)
+                .Select(c => new
+                {
+                    Customer = c,
+                    Date = c.Orders.Min(o => o.OrderDate)
+                });
+
+            foreach (var result in results)
+            {
+                ObjectDumper.Write($"Customer - {result.Customer.CustomerID}, Date - {result.Date.Month}/{result.Date.Year}");
+            }
+        }
     }
 }
