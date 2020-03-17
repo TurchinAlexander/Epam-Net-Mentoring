@@ -25,41 +25,34 @@ namespace SampleQueries
 
 		private DataSource dataSource = new DataSource();
 
-		[Category("Restriction Operators")]
-		[Title("Where - Task 1")]
-		[Description("This sample uses the where clause to find all elements of an array with a value less than 5.")]
+		[Category("Tasks")]
+		[Title("Task 1")]
+		[Description("Show all customers which total turnover of their orders is more than the specified value.")]
 		public void Linq1()
-		{
-			int[] numbers = { 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 };
+        {
+            var totalTurnover = 1000;
 
-			var lowNums =
-				from num in numbers
-				where num < 5
-				select num;
+            var customers = dataSource.Customers
+                .Where(c => c.Orders.Sum(o => o.Total) > totalTurnover)
+                .Select(c => new
+                {
+                    CustomerId = c.CustomerID,
+                    TotalTurnover = c.Orders.Sum(o => o.Total)
+                });
 
-			Console.WriteLine("Numbers < 5:");
-			foreach (var x in lowNums)
-			{
-				Console.WriteLine(x);
-			}
-		}
+            foreach (var customer in customers)
+            {
+                ObjectDumper.Write($"CustomerId - {customer.CustomerId}, Total Turnover - {customer.TotalTurnover}");
+            }
 
-		[Category("Restriction Operators")]
-		[Title("Where - Task 2")]
-		[Description("This sample return return all presented in market products")]
+            totalTurnover = 1500;
 
-		public void Linq2()
-		{
-			var products =
-				from p in dataSource.Products
-				where p.UnitsInStock > 0
-				select p;
+            foreach (var customer in customers)
+            {
+                ObjectDumper.Write($"CustomerId - {customer.CustomerId}, Total Turnover - {customer.TotalTurnover}");
+            }
+        }
 
-			foreach (var p in products)
-			{
-				ObjectDumper.Write(p);
-			}
-		}
-
-	}
+		
+    }
 }
