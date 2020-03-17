@@ -20,17 +20,16 @@ using Task.Data;
 
 namespace SampleQueries
 {
-	[Title("LINQ Module")]
-	[Prefix("Linq")]
-	public class LinqSamples : SampleHarness
-	{
+    [Title("LINQ Module")]
+    [Prefix("Linq")]
+    public class LinqSamples : SampleHarness
+    {
+        private DataSource dataSource = new DataSource();
 
-		private DataSource dataSource = new DataSource();
-
-		[Category("Tasks")]
-		[Title("Task 1")]
-		[Description("Show all customers which total turnover of their orders is more than the specified value.")]
-		public void Linq1()
+        [Category("Tasks")]
+        [Title("Task 1")]
+        [Description("Show all customers which total turnover of their orders is more than the specified value.")]
+        public void Linq1()
         {
             var totalTurnover = 1000;
 
@@ -65,13 +64,14 @@ namespace SampleQueries
                 {
                     CustomerId = c.CustomerID,
                     Suppliers = dataSource.Suppliers
-                        .Where(s => s.Country == c.Country 
+                        .Where(s => s.Country == c.Country
                                     && s.City == c.City)
                 });
 
             foreach (var result in results)
             {
-                ObjectDumper.Write($"CustomerId - {result.CustomerId}, Suppliers - {string.Join(", ", result.Suppliers.Select(s => s.SupplierName))}");
+                ObjectDumper.Write(
+                    $"CustomerId - {result.CustomerId}, Suppliers - {string.Join(", ", result.Suppliers.Select(s => s.SupplierName))}");
             }
         }
 
@@ -83,8 +83,8 @@ namespace SampleQueries
             var groupResults = dataSource.Customers
                 .GroupJoin(
                     dataSource.Suppliers,
-                    c => new { c.Country, c.City },
-                    s => new { s.Country, s.City },
+                    c => new {c.Country, c.City},
+                    s => new {s.Country, s.City},
                     (c, s) => new
                     {
                         Customer = c,
@@ -93,7 +93,8 @@ namespace SampleQueries
 
             foreach (var result in groupResults)
             {
-                ObjectDumper.Write($"CustomerId - {result.Customer.CustomerID}, Suppliers - {string.Join(", ", result.Suppliers.Select(s => s.SupplierName))}");
+                ObjectDumper.Write(
+                    $"CustomerId - {result.Customer.CustomerID}, Suppliers - {string.Join(", ", result.Suppliers.Select(s => s.SupplierName))}");
             }
         }
 
@@ -128,7 +129,8 @@ namespace SampleQueries
 
             foreach (var result in results)
             {
-                ObjectDumper.Write($"Customer - {result.Customer.CustomerID}, Date - {result.Date.Month}/{result.Date.Year}");
+                ObjectDumper.Write(
+                    $"Customer - {result.Customer.CustomerID}, Date - {result.Date.Month}/{result.Date.Year}");
             }
         }
 
@@ -151,24 +153,27 @@ namespace SampleQueries
 
             foreach (var result in results)
             {
-                ObjectDumper.Write($"Customer - {result.Customer.CustomerID}, Date - {result.Date.Month}/{result.Date.Year}");
+                ObjectDumper.Write(
+                    $"Customer - {result.Customer.CustomerID}, Date - {result.Date.Month}/{result.Date.Year}");
             }
         }
 
         [Category("Tasks")]
         [Title("Task 6.")]
-        [Description("Show customers who has bad Postal Code or Region is null or Phone doesn't have operator code in brackets.'.")]
+        [Description(
+            "Show customers who has bad Postal Code or Region is null or Phone doesn't have operator code in brackets.'.")]
         public void Linq6()
         {
             var results = dataSource.Customers
-                .Where(c => c.PostalCode != null 
-                                && !Regex.IsMatch(c.PostalCode, "\\d+")
+                .Where(c => c.PostalCode != null
+                            && !Regex.IsMatch(c.PostalCode, "\\d+")
                             || c.Region == null
                             || !Regex.IsMatch(c.Phone, "/(.+/)"));
 
             foreach (var result in results)
             {
-                ObjectDumper.Write($"Customer - {result.CompanyName}, Postal Code - {result.PostalCode}, Region is Null - {result.Region == null}, Phone - {result.Phone}");
+                ObjectDumper.Write(
+                    $"Customer - {result.CompanyName}, Postal Code - {result.PostalCode}, Region is Null - {result.Region == null}, Phone - {result.Phone}");
             }
         }
 
@@ -194,9 +199,36 @@ namespace SampleQueries
                 {
                     foreach (var item in product.Items)
                     {
-                        ObjectDumper.Write($"Category - {result.Category}, Product Count - {product.Count}, Product - {item.ProductName}, Price - {item.UnitPrice}");
-
+                        ObjectDumper.Write(
+                            $"Category - {result.Category}, Product Count - {product.Count}, Product - {item.ProductName}, Price - {item.UnitPrice}");
                     }
+                }
+            }
+        }
+
+        [Category("Tasks")]
+        [Title("Task 8.")]
+        [Description("Group all products in cheap, medium and expensive.")]
+        public void Linq8()
+        {
+            var mediumLimit = 50;
+            var expensiveLimit = 200;
+
+            var results = dataSource.Products
+                .GroupBy(p => p.UnitPrice > expensiveLimit ? "Expensive"
+                    : p.UnitPrice > mediumLimit ? "Medium"
+                    : "Cheap", (c, p) => new
+                {
+                    Category = c,
+                    Products = p.OrderBy(i => i.UnitPrice)
+                });
+
+            foreach (var result in results)
+            {
+                ObjectDumper.Write($"Category - {result.Category}");
+                foreach (var product in result.Products)
+                {
+                    ObjectDumper.Write($"  Product - {product.ProductName}, Price - {product.UnitPrice}");
                 }
             }
         }
