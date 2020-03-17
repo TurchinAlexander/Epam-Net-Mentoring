@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using SampleSupport;
@@ -151,6 +152,23 @@ namespace SampleQueries
             foreach (var result in results)
             {
                 ObjectDumper.Write($"Customer - {result.Customer.CustomerID}, Date - {result.Date.Month}/{result.Date.Year}");
+            }
+        }
+
+        [Category("Tasks")]
+        [Title("Task 6.")]
+        [Description("Show customers who has bad Postal Code or Region is null or Phone doesn't have operator code in brackets.'.")]
+        public void Linq6()
+        {
+            var results = dataSource.Customers
+                .Where(c => c.PostalCode != null 
+                                && !Regex.IsMatch(c.PostalCode, "\\d+")
+                            || c.Region == null
+                            || !Regex.IsMatch(c.Phone, "/(.+/)"));
+
+            foreach (var result in results)
+            {
+                ObjectDumper.Write($"Customer - {result.CompanyName}, Postal Code - {result.PostalCode}, Region is Null - {result.Region == null}, Phone - {result.Phone}");
             }
         }
     }
