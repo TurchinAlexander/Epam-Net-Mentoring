@@ -33,24 +33,24 @@ namespace SampleQueries
         {
             var totalTurnover = 1000;
 
-            var customers = dataSource.Customers
+            var results = dataSource.Customers
                 .Where(c => c.Orders.Sum(o => o.Total) > totalTurnover)
                 .Select(c => new
                 {
-                    CustomerId = c.CustomerID,
+                    Customer = c,
                     TotalTurnover = c.Orders.Sum(o => o.Total)
                 });
 
-            foreach (var customer in customers)
+            foreach (var result in results)
             {
-                ObjectDumper.Write($"CustomerId - {customer.CustomerId}, Total Turnover - {customer.TotalTurnover}");
+                ObjectDumper.Write($"CustomerId - {result.Customer.CompanyName}, Total Turnover - {result.TotalTurnover}");
             }
 
             totalTurnover = 1500;
 
-            foreach (var customer in customers)
+            foreach (var result in results)
             {
-                ObjectDumper.Write($"CustomerId - {customer.CustomerId}, Total Turnover - {customer.TotalTurnover}");
+                ObjectDumper.Write($"CustomerId - {result.Customer.CompanyName}, Total Turnover - {result.TotalTurnover}");
             }
         }
 
@@ -62,7 +62,7 @@ namespace SampleQueries
             var results = dataSource.Customers
                 .Select(c => new
                 {
-                    CustomerId = c.CustomerID,
+                    Customer = c,
                     Suppliers = dataSource.Suppliers
                         .Where(s => s.Country == c.Country
                                     && s.City == c.City)
@@ -70,8 +70,8 @@ namespace SampleQueries
 
             foreach (var result in results)
             {
-                ObjectDumper.Write(
-                    $"CustomerId - {result.CustomerId}, Suppliers - {string.Join(", ", result.Suppliers.Select(s => s.SupplierName))}");
+                ObjectDumper.Write($"CustomerId - {result.Customer.CompanyName}"); 
+                ObjectDumper.Write($"  Suppliers - {string.Join(", ", result.Suppliers.Select(s => s.SupplierName))}");
             }
         }
 
@@ -93,8 +93,8 @@ namespace SampleQueries
 
             foreach (var result in groupResults)
             {
-                ObjectDumper.Write(
-                    $"CustomerId - {result.Customer.CustomerID}, Suppliers - {string.Join(", ", result.Suppliers.Select(s => s.SupplierName))}");
+                ObjectDumper.Write($"CustomerId - {result.Customer.CustomerID}");
+                ObjectDumper.Write($"  Suppliers - {string.Join(", ", result.Suppliers.Select(s => s.SupplierName))}");
             }
         }
 
@@ -192,6 +192,7 @@ namespace SampleQueries
                         Items = i.OrderByDescending(it => it.UnitPrice)
                     })
                 });
+
 
             foreach (var result in results)
             {
