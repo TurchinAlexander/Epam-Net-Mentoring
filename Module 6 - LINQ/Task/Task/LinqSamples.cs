@@ -171,5 +171,34 @@ namespace SampleQueries
                 ObjectDumper.Write($"Customer - {result.CompanyName}, Postal Code - {result.PostalCode}, Region is Null - {result.Region == null}, Phone - {result.Phone}");
             }
         }
+
+        [Category("Tasks")]
+        [Title("Task 7.")]
+        [Description("Group all products.")]
+        public void Linq7()
+        {
+            var results = dataSource.Products
+                .GroupBy(p => p.Category, (c, p) => new
+                {
+                    Category = c,
+                    Products = p.GroupBy(pr => pr.UnitsInStock, (count, i) => new
+                    {
+                        Count = count,
+                        Items = i.OrderByDescending(it => it.UnitPrice)
+                    })
+                });
+
+            foreach (var result in results)
+            {
+                foreach (var product in result.Products)
+                {
+                    foreach (var item in product.Items)
+                    {
+                        ObjectDumper.Write($"Category - {result.Category}, Product Count - {product.Count}, Product - {item.ProductName}, Price - {item.UnitPrice}");
+
+                    }
+                }
+            }
+        }
     }
 }
