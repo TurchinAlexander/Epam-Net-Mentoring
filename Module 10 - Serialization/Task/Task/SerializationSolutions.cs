@@ -30,7 +30,7 @@ namespace Task
 			var c = categories.First();
 
 			tester.SerializeAndDeserialize(categories);
-		}
+        }
 
 		[TestMethod]
 		public void ISerializable()

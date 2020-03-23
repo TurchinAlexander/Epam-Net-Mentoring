@@ -1,3 +1,6 @@
+using System.Linq;
+using System.Runtime.Serialization;
+
 namespace Task.DB
 {
     using System;
@@ -28,5 +31,18 @@ namespace Task.DB
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Product> Products { get; set; }
+
+        [OnSerializing]
+        public void OnSerializing(StreamingContext context)
+        {
+            using (var dbContext = new Northwind())
+            {
+                dbContext.Configuration.ProxyCreationEnabled = false;
+
+                Products = dbContext.Products
+                    .Where(p => p.CategoryID == CategoryID)
+                    .ToArray();
+            }
+        }
     }
 }
