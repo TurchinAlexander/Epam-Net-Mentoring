@@ -1,3 +1,6 @@
+using System.Runtime.Serialization;
+using System.Linq;
+
 namespace Task.DB
 {
     using System;
@@ -29,5 +32,6 @@ namespace Task.DB
         public virtual Order Order { get; set; }
 
         public virtual Product Product { get; set; }
+
     }
 }
